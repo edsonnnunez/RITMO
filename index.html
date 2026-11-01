@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Plano Edson</title>
+<style>
+:root{--bg:#f2f4f5;--cd:#fff;--tx:#12171a;--mu:#66707a;--ac:#0f766e;--as:#dcf2ee;--bd:#e1e5e8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1012;--cd:#171b1f;--tx:#eef1f3;--mu:#9aa3ab;--ac:#2dd4bf;--as:#0f2e2a;--bd:#262b30;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1012;--cd:#171b1f;--tx:#eef1f3;--mu:#9aa3ab;--ac:#2dd4bf;--as:#0f2e2a;--bd:#262b30;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,system-ui,"Helvetica Neue",Arial,sans-serif;padding-bottom:90px}
+#app{max-width:560px;margin:0 auto;padding:0 14px}
+h1{font-size:28px;margin:18px 0 2px}h2{font-size:18px;margin:22px 0 6px}
+.mu,small{color:var(--mu);font-size:13px}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:8px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.bar{height:8px;background:var(--bd);border-radius:6px;margin:4px 0 8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.ck{flex:none;width:30px;height:30px;border:2px solid var(--ac);border-radius:50%;background:none;color:var(--bg);font:700 16px system-ui}.ck.on{background:var(--ac)}
+.it{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--bd);padding:9px 0 3px;margin-top:6px;color:var(--tx);font:inherit}.it small{display:block}.it>small{text-align:right;flex:none}.it.sw{color:var(--ac)}
+.ch{width:44px;height:44px;margin:6px 6px 0 0;border-radius:50%;border:2px solid var(--ac);background:none;color:var(--tx);font:600 16px system-ui}.ch.on{background:var(--ac);color:var(--bg)}
+.pl{display:flex;gap:6px;overflow-x:auto;padding:14px 0 4px}.p{flex:none;padding:9px 15px;border-radius:20px;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font:600 15px system-ui}.p.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.b{padding:10px 16px;border-radius:12px;border:0;background:var(--ac);color:var(--bg);font:600 16px system-ui}.b.g{background:var(--as);color:var(--ac)}
+input{width:100px;padding:9px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:16px system-ui}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:9px 0 7px;border:0;background:none;color:var(--mu);font:12px system-ui}nav button.on{color:var(--ac);font-weight:700}
+#tm{display:none;position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));background:var(--ac);color:var(--bg);padding:12px 16px;border-radius:14px;justify-content:space-between;align-items:center;font-weight:700}#tm button{background:none;border:0;color:inherit;font-size:20px}
+#sh{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:flex-end}.sb{background:var(--cd);width:100%;max-height:80vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+</style></head><body>
+<div id="app"></div>
+<div id="tm"><span id="tt"></span><button data-a="x">✕</button></div>
+<div id="sh"><div class="sb" id="sb"></div></div>
+<nav><button data-a="tab" data-t="h">🏠<br>Hoje</button><button data-a="tab" data-t="t">🏋️<br>Treino</button><button data-a="tab" data-t="d">🍽️<br>Cardápio</button><button data-a="tab" data-t="p">⚖️<br>Peso</button></nav>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),n1=v=>String(Math.round(v*10)/10).replace('.',','),
+fm=s=>Math.floor(s/60)+':'+pad(s%60),D=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],DN=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),today=()=>iso(new Date()),
+S={g(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}},
+rec=()=>S.g('d:'+today(),{m:[0,0,0,0],w:0,s:{}}),save=r=>S.s('d:'+today(),r),TG=[2050,155,230,55];
+// alimento: [nome,kcal,P,C,G,grupo,unidade,g/unidade] por 100 g
+const F={coxa:['Coxa/sobrecoxa sem pele',165,25,0,7,'P'],peito:['Peito de frango',160,31,0,3,'P'],moela:['Moela cozida',154,30.4,0,2.7,'P'],figado:['Fígado bovino',180,27,4.5,5.5,'P'],patinho:['Patinho grelhado',195,32,0,6.5,'P'],moida:['Carne moída magra',200,29,0,8.5,'P'],atum:['Atum ao natural',108,23.3,0,.8,'P','lata',120],sardinha:['Sardinha em lata',206,24.4,0,11.4,'P','lata',85],ovo:['Ovo',146,13,.8,10,'P','un',50],clara:['Clara de ovo',52,11,.7,.2,'P','un',33],
+ricota:['Ricota',140,12.6,3.8,8.1,'Q'],coalho:['Queijo coalho',315,23,2,24,'Q'],
+arroz:['Arroz cozido',128,2.5,28.1,.2,'C','col. sopa',25],macarrao:['Macarrão cozido',158,5.8,31,.9,'C'],batata_doce:['Batata-doce cozida',77,.6,18.4,.1,'C'],cuscuz:['Cuscuz cozido',115,2.3,25,.7,'C'],mandioca:['Mandioca cozida',125,.6,30,.3,'C'],pao:['Pão francês',300,8,58.6,3.1,'C','un',50],
+banana:['Banana-prata',98,1.3,26,.1,'F','un',70],maca:['Maçã',56,.3,15.2,.2,'F','un',130],mamao:['Mamão',40,.5,10,.1,'F'],laranja:['Laranja',37,1,9,.1,'F','un',150],
+azeite:['Azeite de oliva',884,0,0,100,'G','col. chá',4.6],pasta:['Pasta de amendoim',600,25,17,50,'G','col. sopa',15],amendoim:['Amendoim torrado',565,26,16,49,'G'],
+goma:['Goma de tapioca',352,.2,87,0,'X','col. sopa',15],iogurte:['Iogurte natural',62,3.8,5,3.2,'X','pote',170],feijao:['Feijão cozido',76,4.8,13.6,.5,'X','concha',120],salada:['Salada de folhas e tomate',20,1.2,3.8,.2,'X'],legumes:['Legumes cozidos',30,2,5.5,.3,'X'],couve:['Couve refogada',70,2.5,6,4.5,'X'],molho:['Molho de tomate',38,1.2,7.5,.4,'X'],livre:['Almoço livre: 1 prato, proteína primeiro, sem repetir',750,45,85,25,'X']};
+const AL=[['coxa',140],['arroz',120],['feijao',120],['salada',100],['legumes',100],['azeite',4.6]],CB=[['ovo',100],['clara',66],['goma',30],['coalho',30],['mamao',150]],SD=[['pao',50],['sardinha',85],['maca',130]],MC=[['macarrao',150],['moida',130],['molho',80],['salada',100],['legumes',100]],MB=[['moela',130],['batata_doce',200],['arroz',40],['feijao',120],['couve',60],['salada',100],['azeite',4.6]],CA=[['ovo',100],['clara',66],['cuscuz',150],['banana',70],['iogurte',170]],LA=[['pao',50],['peito',80],['ricota',25],['salada',30],['banana',70]];
+const MN={A:['Cardápio A · Frango',[['Café da manhã','07:00',CA],['Almoço','13:00',AL],['Lanche pré-treino','16:00',LA],['Jantar','20:00',AL]]],
+B1:['Cardápio B · Fígado',[['Café da manhã','07:00',CB],['Almoço','13:00',[['figado',130],['arroz',150],['feijao',120],['couve',60],['salada',100],['legumes',100],['azeite',4.6]]],['Lanche pré-treino','16:00',[['pao',50],['atum',120],['maca',130]]],['Jantar','20:00',AL]]],
+C:['Cardápio C · Macarrão com carne',[['Café da manhã','07:00',[['pao',50],['ovo',100],['clara',33],['coalho',30],['mamao',150]]],['Almoço','13:00',MC],['Lanche pré-treino','16:00',SD],['Jantar','20:00',MC]]],
+B2:['Cardápio D · Moela e batata-doce',[['Café da manhã','07:00',CB],['Almoço','13:00',MB],['Lanche pré-treino','16:00',SD],['Jantar','20:00',MB]]],
+D:['Domingo · Almoço livre',[['Café da manhã','07:00',CA],['Almoço livre','13:00',[['livre',100]]],['Lanche','16:00',LA],['Jantar','20:00',[['pao',50],['atum',120],['salada',100],['maca',130]]]]]},
+MD=['D','A','B1','C','A','B2','C'];
+const T0=[{n:'Descanso',f:'Sem treino de força. Caminhe 45–60 min.',x:[]},
+{n:'Segunda · Peito, ombros e tríceps',f:'Supino inclinado é a prioridade',x:[['Supino inclinado c/ halteres',4,'6–10',150],['Supino reto',3,'6–10',150],['Crossover baixo→alto',3,'12–15',75],['Desenvolvimento c/ halteres',3,'8–10',120],['Elevação lateral',4,'12–20',75],['Tríceps na polia (corda)',3,'10–15',75],['Tríceps francês unilateral',3,'10–12',75]]},
+{n:'Terça · Costas e bíceps',f:'Unilaterais: comece pelo lado esquerdo',c:'Cardio leve 25–30 min',x:[['Puxada frontal',4,'8–12',120],['Remada curvada c/ barra',3,'6–10',150],['Remada unilateral (serrote)',3,'10–12',90],['Pulldown braço estendido',3,'12–15',75],['Face pull',4,'15–20',60],['Rosca direta',3,'8–12',90],['Rosca martelo',3,'10–12',75]]},
+{n:'Quarta · Pernas',f:'Única sessão de perna, glúteo moderado',x:[['Agachamento profundo',4,'6–10',180],['Leg press 45°',3,'10–15',150],['Stiff',3,'8–10',150],['Hip thrust',3,'8–12',120],['Mesa flexora',3,'10–15',90],['Panturrilha em pé',4,'8–12',75],['Prancha (segundos)',3,'30–45',45]]},
+{n:'Quinta · Ombros e braços',f:'Prioridade: deltoide lateral e posterior',c:'Cardio leve 25–30 min',x:[['Desenvolvimento militar',4,'5–8',150],['Elevação lateral no cabo',4,'12–20',60],['Crucifixo invertido',4,'15–20',60],['Rosca inclinada',3,'10–12',90],['Tríceps testa',3,'10–12',90],['Rosca Scott / polia',3,'12–15',75],['Tríceps na polia (barra)',3,'10–15',75]]},
+{n:'Sexta · Peito e costas',f:'Superior completo',c:'Cardio leve 25–30 min',x:[['Supino inclinado Smith/máquina',4,'8–12',120],['Barra fixa',3,'6–10',150],['Peck-deck',3,'12–15',75],['Remada baixa',3,'8–12',120],['Elevação lateral',3,'15–20',60],['Pullover na polia',3,'12–15',75],['Abdominal na polia',3,'12–15',60]]},
+{n:'Descanso',f:'Sem treino de força. Caminhe 45–60 min.',x:[]}];
+const T=[{n:'Descanso',f:'Sem treino de força. Caminhe 45–60 min.',x:[]},
+{n:'Segunda · Superior A',f:'Peito superior, costas e ombros. Dia pesado',c:'Cardio leve 25 min',x:[['Supino inclinado c/ halteres',4,'6–10',150],['Puxada frontal',4,'8–12',120],['Desenvolvimento c/ halteres',3,'8–10',120],['Remada curvada c/ barra',3,'6–10',150],['Elevação lateral',3,'12–20',75],['Tríceps na polia (corda)',3,'10–15',75],['Rosca direta',3,'8–12',90]]},
+{n:'Terça · Pernas A',f:'Foco em quadríceps; glúteo moderado',x:[['Agachamento profundo',4,'6–10',180],['Leg press 45°',3,'10–15',150],['Cadeira extensora',3,'12–15',75],['Mesa flexora',3,'10–15',90],['Panturrilha em pé',4,'8–12',75],['Prancha (segundos)',3,'30–45',45]]},
+{n:'Quarta · Push',f:'Peito e ombros, com deltoide lateral em destaque',c:'Cardio leve 25 min',x:[['Supino reto (barra ou máquina)',3,'6–10',150],['Desenvolvimento militar',3,'5–8',150],['Supino inclinado Smith/máquina',3,'8–12',120],['Elevação lateral no cabo',4,'12–20',60],['Crossover baixo→alto',3,'12–15',75],['Tríceps francês unilateral',3,'10–12',75],['Tríceps testa',2,'10–12',90]]},
+{n:'Quinta · Pull',f:'Costas (espessura), ombro posterior e bíceps',c:'Cardio leve 25 min',x:[['Remada baixa',3,'8–12',120],['Barra fixa',3,'6–10',150],['Remada unilateral (serrote)',3,'10–12',90],['Crucifixo invertido',4,'15–20',60],['Elevação lateral (máquina/halteres)',3,'15–20',60],['Rosca inclinada',3,'10–12',90],['Rosca martelo',3,'10–12',75]]},
+{n:'Sexta · Pernas B',f:'Posterior de coxa e glúteo moderado',x:[['Stiff',4,'6–10',150],['Hip thrust',3,'8–12',120],['Agachamento búlgaro (por perna)',3,'8–12',90],['Cadeira flexora',3,'10–15',90],['Panturrilha sentada',4,'12–20',60],['Abdominal na polia',3,'12–15',60]]},
+{n:'Descanso',f:'Sem treino de força. Caminhe 45–60 min.',x:[]}];
+const RG='<div class=c><b>Regras rápidas</b><br><small>• Proteína em todas as refeições.<br>• Pese a comida pronta nas primeiras 2–3 semanas.<br>• Salada primeiro; 500 mL de água antes do almoço e do jantar.<br>• Fígado 1× por semana; sardinha 2–3×.<br>• Domingo: almoço livre, sem compensar depois.<br>• Semanas 6 e 12: +100 g de arroz no almoço e no jantar e +1 pão no café.<br>• Sem vesícula: até ≈ 19 g de gordura por refeição.</small></div>';
+let WK=S.g('wk',1),SW=S.g('sw',{}),tmr,tab='h',vd=new Date().getDay(),vt=vd>=1&&vd<=5?vd:1;
+const mc=(f,g)=>[1,2,3,4].map(i=>F[f][i]*g/100),
+qty=(f,g)=>{if(f=='livre')return'1 prato';const u=F[f][6];return n1(g)+' g'+(u?' ≈ '+n1(g/F[f][7])+' '+u:'')},
+mx=x=>'P '+n1(x[1])+' · C '+n1(x[2])+' · G '+n1(x[3]),PX={P:2,Q:2,C:3,F:3,G:4},
+tot=ms=>ms.reduce((a,m)=>a.map((q,k)=>q+m.t[k]),[0,0,0,0]),
+pills=(s,a,ds)=>'<div class=pl>'+ds.map(d=>`<button class="p${d==s?' on':''}" data-a=${a} data-d=${d}>${D[d]}</button>`).join('')+'</div>';
+function calc(m){return MN[m][1].concat(WK==6?[['Extras de manutenção','ao longo do dia',[['arroz',200],['pao',50]]]]:[]).map((r,ri)=>{const it=r[2].map((v,ii)=>{const s=SW[m+'.'+ri+'.'+ii],f=s?s[0]:v[0],g=s?s[1]:v[1];return{f,g,x:mc(f,g),s:!!s}});return{n:r[0],h:r[1],it,t:it.reduce((a,o)=>a.map((q,k)=>q+o.x[k]),[0,0,0,0])}})}
+function bars(t,l){return`<div class=c><b>${l}</b>`+['kcal','Proteína','Carboidrato','Gordura'].map((n,k)=>`<div class=row><span>${n}</span><span class=mu>${Math.round(t[k])} / ${TG[k]}${k?' g':''}</span></div><div class=bar><i style="width:${Math.min(100,t[k]/TG[k]*100)}%"></i></div>`).join('')+'</div>'}
+function meals(m,chk){const ms=calc(m),T=tot(ms),R=rec();return ms.map((r,ri)=>`<div class=c><div class=row><span class=row>${chk?`<button class="ck${R.m[ri]?' on':''}" data-a=meal data-i=${ri}>${R.m[ri]?'✓':''}</button>`:''}<b>${r.n} · ${r.h}</b></span><small>${Math.round(r.t[0])} kcal · ${Math.round(r.t[0]/T[0]*100)}% do dia</small></div><small>${mx(r.t)}</small>`+r.it.map((o,ii)=>`<button class="it${o.s?' sw':''}" data-a=sub data-m=${m} data-r=${ri} data-i=${ii}><span>${F[o.f][0]}<small>${qty(o.f,o.g)}</small></span><small>${Math.round(o.x[0])} kcal<br>${mx(o.x)}</small></button>`).join('')+'</div>').join('')}
+function sheet(m,r,i){const o=calc(m)[r].it[i],a=F[o.f],G=a[5],ix=PX[G],k=m+'.'+r+'.'+i;let h=`<div class=row><b>${a[0]}</b><button class="b g" data-a=cl>Fechar</button></div>`;
+if(!ix)h+='<p>Este item não precisa de troca.</p>';else{h+=`<small>Trocas com o mesmo ${G=='G'?'teor de gordura':G=='C'||G=='F'?'teor de carboidrato':'teor de proteína'}</small>`;if(o.s)h+=`<p><button class="b g" data-a=rst data-k="${k}">Voltar ao original</button></p>`;
+Object.keys(F).filter(id=>F[id][5]==G&&id!=o.f).forEach(id=>{const b=F[id],base=a[ix]*o.g/100,g=G=='G'?Math.max(1,Math.round(base/b[ix]*100)):Math.max(5,Math.round(base/b[ix]*20)*5),x=mc(id,g);h+=`<div class=c><div class=row><b>${b[0]}</b><button class=b data-a=use data-k="${k}" data-f=${id} data-g=${g}>Usar</button></div><small>${qty(id,g)}</small><br><small>${Math.round(x[0])} kcal · ${mx(x)}</small></div>`})}
+$('#sb').innerHTML=h;$('#sh').style.display='flex'}
+const RIR=['RIR 3: cargas conservadoras','RIR 2: suba as cargas','RIR 1–2: suba as cargas','RIR 1: pico de carga','RIR 0–1 nos isoladores: pico','Deload: 2 séries por exercício, RIR 3–4'];
+function wkbar(){return'<h2>Semana do ciclo</h2><div class=pl>'+[1,2,3,4,5,6].map(w=>`<button class="p${w==WK?' on':''}" data-a=wk data-d=${w}>${w}</button>`).join('')+'</div><small>'+RIR[WK-1]+'</small>'}
+function sess(d){const t=T[d],r=rec(),L=S.g('ld',{}),dl=WK==6,ns=e=>dl?Math.min(2,e[1]):e[1];if(!t.x.length)return`<div class=c><b>${t.n}</b><br>${t.f}</div>`;
+return`<div class=c><b>${t.n}</b><br><small>${t.f}</small></div>`+t.x.map((e,i)=>{const k=d+'-'+i,n=r.s[k]||0;return`<div class=c><div class=row><b>${e[0]}</b><small>${ns(e)}×${e[2]}</small></div><div class=row><div>`+Array.from({length:ns(e)},(_,j)=>`<button class="ch${j<n?' on':''}" data-a=set data-k=${k} data-j=${j+1} data-r=${e[3]}>${j+1}</button>`).join('')+`</div><label><small>kg </small><input type=text inputmode=decimal data-a=ld data-n="${e[0]}" value="${L[e[0]]||''}" placeholder="—"></label></div><small>Descanso ${fm(e[3])}</small></div>`}).join('')+(t.c?`<div class=c>🚶 ${t.c}</div>`:'')}
+function hoje(){const n=new Date(),d=n.getDay(),m=MD[d],R=rec(),c=[0,0,0,0];calc(m).forEach((r,i)=>{if(R.m[i])r.t.forEach((v,k)=>c[k]+=v)});
+return`<h1>${DN[d]}</h1><div class=mu>${n.toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div>`+bars(c,'Comi até agora')+`<h2>🍽️ ${MN[m][0]}</h2><small>Marque a refeição quando comer. Toque num item para ver trocas.</small>`+meals(m,1)+`<div class=c><div class=row><b>💧 Água</b><span class=mu>${n1(R.w/1000)} / 3 L</span></div><div class=bar><i style="width:${Math.min(100,R.w/30)}%"></i></div><div class=row><button class="b g" data-a=w data-v=-250>−250</button><button class=b data-a=w data-v=250>+250 mL</button></div></div><h2>🏋️ Treino de hoje</h2>`+sess(d)}
+function dieta(){const m=MD[vd];return pills(vd,'day',[1,2,3,4,5,6,0])+`<h2>${MN[m][0]}</h2>`+bars(tot(calc(m)),'Total do dia')+'<small>Toque num item para ver trocas equivalentes.</small>'+meals(m,0)+RG}
+function peso(){const W=S.g('wt',[]),av=l=>l.reduce((s,x)=>s+x.kg,0)/(l.length||1);let msg='Pese-se todo dia ao acordar. A tendência aparece com 14 registros.';
+if(W.length>=14){const a=av(W.slice(-7)),c=a-av(W.slice(-14,-7));msg='Média de 7 dias: '+n1(a)+' kg ('+(c>0?'+':'')+n1(c)+' kg na semana). '+(c<=-.8?'Rápido demais: suba 150–200 kcal em carboidrato.':c<=-.3?'No ritmo: mantenha tudo.':c<=-.2?'Quase no ritmo: mantenha e observe a cintura.':'Lento: se a cintura também parou por 2 semanas, corte ≈ 150 kcal ou some 2.000 passos por dia.')}
+const l=W.slice(-30),v=l.map(x=>x.kg),mn=Math.min(...v),r=(Math.max(...v)-mn)||1,sp=l.length>1?`<svg viewBox="0 0 300 70" width="100%" height="70"><polyline fill="none" stroke="var(--ac)" stroke-width="2.5" points="${l.map((x,i)=>(i*300/(l.length-1)).toFixed(1)+','+(65-(x.kg-mn)/r*60).toFixed(1)).join(' ')}"/></svg>`:'';
+return`<h1>Peso e cintura</h1><div class=mu>Meta da Fase 1: ≈ 72 kg e cintura de 82–84 cm</div><div class=c><div class=row><input id=kg type=text inputmode=decimal placeholder="Peso kg"><input id=wa type=text inputmode=decimal placeholder="Cintura cm"><button class=b data-a=sv>Salvar</button></div></div><div class=c>${msg}${sp}</div>`+W.slice(-8).reverse().map(x=>`<div class="c row"><span>${x.d.slice(8)}/${x.d.slice(5,7)}</span><b>${n1(x.kg)} kg</b><span class=mu>${x.wa?n1(x.wa)+' cm':''}</span></div>`).join('')}
+function timer(s){clearInterval(tmr);$('#tm').style.display='flex';const e=Date.now()+s*1000,u=()=>{const r=Math.ceil((e-Date.now())/1000);if(r<=0){clearInterval(tmr);$('#tt').textContent='Hora da próxima série!';return}$('#tt').textContent='Descanso '+fm(r)};u();tmr=setInterval(u,500)}
+function autoWK(){let st=S.g('st',0);if(!st){const d=new Date();d.setDate(d.getDate()+(8-d.getDay())%7);st=iso(d);S.s('st',st)}const n=Math.floor((Date.parse(today())-Date.parse(st))/6048e5)+1;WK=n<1?1:n<=12?(n-1)%6+1:Math.min(5,n-11)}
+function render(){TG.splice(0,4,...(WK==6?[2450,164,315,57]:[2050,155,230,55]));$('#app').innerHTML={h:hoje,t:()=>wkbar()+pills(vt,'tday',[1,2,3,4,5])+sess(vt)+'<div class=c><small><b>Estratégia para crescer rápido</b><br>• Cada músculo 2× por semana: Superior, Pernas, Push, Pull, Pernas.<br>• Termine com 1–2 repetições de reserva; nos isoladores, até 0–1.<br>• Bateu o topo das repetições em todas as séries? Suba a carga na próxima.<br>• Desça controlando (2–3 s) e use amplitude completa, alongando o músculo.<br>• Descanso: 2–3 min nos básicos e 60–90 s nos isoladores.<br>• Anote as cargas no campo kg. Semana 6 é deload.<br>• Cardio leve depois de segunda, quarta e quinta; fim de semana: caminhada de 45–60 min.</small></div>',d:dieta,p:peso}[tab]();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
+document.addEventListener('click',e=>{if(e.target.id=='sh'){e.target.style.display='none';return}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,q=t.dataset,r=rec();
+if(a=='tab'){tab=q.t;scrollTo(0,0);render()}else if(a=='day'){vd=+q.d;render()}else if(a=='tday'){vt=+q.d;render()}
+else if(a=='meal'){r.m[q.i]^=1;save(r);render()}else if(a=='w'){r.w=Math.max(0,r.w+ +q.v);save(r);render()}
+else if(a=='set'){const n=r.s[q.k]||0,j=+q.j;r.s[q.k]=j==n?j-1:j;save(r);if(r.s[q.k]>n)timer(+q.r);render()}
+else if(a=='wk'){WK=+q.d;S.s('wk',WK);render()}
+else if(a=='sub')sheet(q.m,+q.r,+q.i);
+else if(a=='use'){SW[q.k]=[q.f,+q.g];S.s('sw',SW);$('#sh').style.display='none';render()}
+else if(a=='rst'){delete SW[q.k];S.s('sw',SW);$('#sh').style.display='none';render()}
+else if(a=='cl')$('#sh').style.display='none';
+else if(a=='x'){clearInterval(tmr);$('#tm').style.display='none'}
+else if(a=='sv'){const pf=v=>parseFloat(String(v).replace(',','.')),kg=pf($('#kg').value),wa=pf($('#wa').value);if(kg){const W=S.g('wt',[]).filter(x=>x.d!=today());W.push({d:today(),kg,wa:wa||0});W.sort((x,y)=>x.d<y.d?-1:1);S.s('wt',W);render()}}});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset.a=='ld'){const L=S.g('ld',{});L[t.dataset.n]=t.value;S.s('ld',L)}});
+autoWK();render();
+</script></body></html>
